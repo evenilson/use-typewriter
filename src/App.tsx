@@ -1,0 +1,19 @@
+import { useTypeWriter } from "./hooks"
+
+function App() {
+  
+  const text = useTypeWriter({
+    texts: ["Wello, world!", "Welcome to my site."],
+    writeSpeed: 100,
+    eraseSpeed: 50,
+    loop: true
+  })
+
+  return (
+    <main className="bg-zinc-900 w-full h-screen flex items-center justify-center">
+      <span className="text-zinc-100 text-7xl">{text}</span>
+    </main>
+  )
+}
+
+export default App
