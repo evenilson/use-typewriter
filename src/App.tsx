@@ -1,9 +1,8 @@
 import { useTypeWriter } from "./hooks"
 
-function App() {
-  
+export function App() {
   const text = useTypeWriter({
-    texts: ["Wello, world!", "Welcome to my site."],
+    texts: ["Hello, world!", "Welcome to my site."],
     writeSpeed: 100,
     eraseSpeed: 50,
     loop: true
@@ -15,5 +14,3 @@ function App() {
     </main>
   )
 }
-
-export default App

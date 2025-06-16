@@ -22,14 +22,25 @@ interface UseTypeWriterProvider {
   eraseSpeed?: number;
 
   /**
-   * Wheter the animation should repeat indefinitely.
+   * Time to pause (in milliseconds) after typing a phrase before starting to erase it.
+   * @default 1000
+   */
+  pauseBeforeDelete?: number;
+
+  /**
+   * Time to pause (in milliseconds) between finishing erasing one phrase and starting to type the next phrase.
+   * @default 500
+   */
+  pauseBetweenPhrases?: number;
+
+  /**
+   * Whether the animation should repeat indefinitely.
    * @default false
    */
   loop?: boolean;
 
   /**
    * Callback triggered when all phrases have been typed and erased (only if loop  is false).
-   * @default 100
    */
   onCycleComplete?: () => void;
 }
@@ -37,7 +48,7 @@ interface UseTypeWriterProvider {
 /**
  * 
  * @param options Configuration options for typing speed, loop behavior, etc. 
- * @returns The current displayed text as it´s being typed or erased.
+ * @returns The current displayed text as it's being typed or erased.
  * 
  * @example
  * const text = useTypeWriter({
@@ -51,6 +62,8 @@ export function useTypeWriter({
   texts,
   writeSpeed = 100,
   eraseSpeed = 50,
+  pauseBeforeDelete = 1000,
+  pauseBetweenPhrases = 500,
   loop = false,
   onCycleComplete = () => { }
 }: UseTypeWriterProvider) {
@@ -87,13 +100,13 @@ export function useTypeWriter({
       if (delta >= speed) {
         if (!isDeletingRef.current) {
           // Typing mode
-          charIndexRef.current += 1;
+          charIndexRef.current = Math.min(charIndexRef.current + 1, currentText.length);
           setDisplayed(currentText.slice(0, charIndexRef.current));
 
           // Reached the end of the phrase
           if (charIndexRef.current >= currentText.length) {
             isDeletingRef.current = true;
-            pauseUntilRef.current = time + 1000; // Wait before deleting
+            pauseUntilRef.current = time + pauseBeforeDelete; // Wait before deleting
           }
         } else {
           // Deleting mode
@@ -116,7 +129,7 @@ export function useTypeWriter({
               phraseIndexRef.current = nextIndex;
             }
             charIndexRef.current = 0;
-            pauseUntilRef.current = time + 500; // Pause briefly before typing the next phrase
+            pauseUntilRef.current = time + pauseBetweenPhrases; // Pause briefly before typing the next phrase
           }
         }
         lastFrameTimeRef.current = time; // Update last action time
@@ -137,7 +150,7 @@ export function useTypeWriter({
       }
     };
 
-  }, [writeSpeed, eraseSpeed, loop, texts, onCycleComplete]);
+  }, [writeSpeed, eraseSpeed, loop, texts, onCycleComplete, pauseBeforeDelete, pauseBetweenPhrases]);
 
   return displayed
 }
